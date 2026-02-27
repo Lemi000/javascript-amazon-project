@@ -1,5 +1,5 @@
-import { products } from '../data/products.js';
-import { cart } from '../data/cart.js';
+import {products} from '../data/products.js';
+import {cart, addToCart} from '../data/cart.js';
 
 let productsHTML = '';
 
@@ -56,8 +56,30 @@ products.forEach(product => {
     </div>
   `;
 })
-
 document.querySelector('.js-products-grid').innerHTML = productsHTML;
+
+
+function renderAddedMsg(timeoutId, productId) {
+  clearTimeout(timeoutId);
+  const addedMsg = document.querySelector(`.js-added-to-cart-${productId}`);
+
+  addedMsg.classList.add('added-to-cart-visible');
+  
+  return setTimeout(() => {
+    addedMsg.classList.remove('added-to-cart-visible')
+  }, 2000);
+}
+
+function updateCartQuantity() {
+  let cartQuantity = 0;
+
+  cart.forEach(cartItem => {
+    cartQuantity += cartItem.quantity;
+  })
+  document.querySelector('.js-cart-quantity')
+    .innerHTML = cartQuantity;
+}
+
 
 document.querySelectorAll('.js-add-to-cart')
   .forEach(button => {
@@ -66,37 +88,10 @@ document.querySelectorAll('.js-add-to-cart')
       const { productId } = button.dataset;
       const quantity = Number(document.querySelector(`.js-quantity-selector-${productId}`).value);
 
-      let matchingItem;
+      addToCart(productId, quantity);
 
-      cart.forEach(item => {
-        if (item.productId === productId) {
-          matchingItem = item;
-        }
-      })
+      timeoutId = renderAddedMsg(timeoutId, productId);
 
-      if (matchingItem) {
-        matchingItem.quantity += quantity;
-      } else {
-        cart.push({
-          productId,
-          quantity
-        });
-      }
-
-      clearTimeout(timeoutId);
-      const addedMsg = document.querySelector(`.js-added-to-cart-${productId}`);
-      addedMsg.classList.add('added-to-cart-visible');
-      timeoutId = setTimeout(() => {
-        addedMsg.classList.remove('added-to-cart-visible')
-      }, 2000);
-
-
-      let cartQuantity = 0;
-
-      cart.forEach(item => {
-        cartQuantity += item.quantity;
-      })
-      document.querySelector('.js-cart-quantity')
-        .innerHTML = cartQuantity;
+      updateCartQuantity();
     })
 })
