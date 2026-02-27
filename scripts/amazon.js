@@ -1,5 +1,5 @@
 import {products} from '../data/products.js';
-import { cart, addToCart } from '../data/cart.js';
+import { cart, addToCart, calculateCartQuantity } from '../data/cart.js';
 import { formatCurrency } from './utils/money.js';
 
 let productsHTML = '';
@@ -57,30 +57,8 @@ products.forEach(product => {
     </div>
   `;
 })
+
 document.querySelector('.js-products-grid').innerHTML = productsHTML;
-
-
-function renderAddedMsg(timeoutId, productId) {
-  clearTimeout(timeoutId);
-  const addedMsg = document.querySelector(`.js-added-to-cart-${productId}`);
-
-  addedMsg.classList.add('added-to-cart-visible');
-  
-  return setTimeout(() => {
-    addedMsg.classList.remove('added-to-cart-visible')
-  }, 2000);
-}
-
-function updateCartQuantity() {
-  let cartQuantity = 0;
-
-  cart.forEach(cartItem => {
-    cartQuantity += cartItem.quantity;
-  })
-  document.querySelector('.js-cart-quantity')
-    .innerHTML = cartQuantity;
-}
-
 
 document.querySelectorAll('.js-add-to-cart')
   .forEach(button => {
@@ -95,4 +73,23 @@ document.querySelectorAll('.js-add-to-cart')
 
       updateCartQuantity();
     })
-})
+  })
+
+updateCartQuantity();
+
+
+function renderAddedMsg(timeoutId, productId) {
+  clearTimeout(timeoutId);
+  const addedMsg = document.querySelector(`.js-added-to-cart-${productId}`);
+
+  addedMsg.classList.add('added-to-cart-visible');
+  
+  return setTimeout(() => {
+    addedMsg.classList.remove('added-to-cart-visible')
+  }, 2000);
+}
+
+function updateCartQuantity() {
+  document.querySelector('.js-cart-quantity')
+    .innerHTML = calculateCartQuantity();
+}
