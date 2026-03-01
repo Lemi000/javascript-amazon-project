@@ -98,7 +98,11 @@ export default function renderOrderSummary() {
           return;
         }
 
-        updateQuantity(productId, newQuantity);
+        if (newQuantity === 0) {
+          removeFromCart(productId);
+        } else {
+          updateQuantity(productId, newQuantity);
+        }
 
         renderCheckoutHeader();
         renderOrderSummary();
