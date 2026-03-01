@@ -1,16 +1,15 @@
 import dayjs from 'https://unpkg.com/supersimpledev@8.5.0/dayjs/esm/index.js';
 
-import { calculateCartQuantity, cart, removeFromCart, updateQuantity, updateDeliveryOption } from "../../data/cart.js";
-import { products, getProduct } from "../../data/products.js";
+import { cart, removeFromCart, updateQuantity, updateDeliveryOption } from "../../data/cart.js";
+import { getProduct } from "../../data/products.js";
 import { deliveryOptions, getDeliveryOption } from "../../data/deliveryOptions.js";
 import { formatCurrency } from '../utils/money.js';
 import renderPaymentSummary from './paymentSummary.js';
+import renderCheckoutHeader from './checkoutHeader.js';
 
 export default function renderOrderSummary() {
 
   let cartSummaryHTML = '';
-  
-  updateCartQuantity();
 
   cart.forEach(cartItem => {
     const productId = cartItem.productId;
@@ -76,9 +75,9 @@ export default function renderOrderSummary() {
       link.addEventListener('click', () => {
         const productId = link.dataset.productId;
         removeFromCart(productId);
-        document.querySelector(`.js-cart-item-container-${productId}`).remove();
-        updateCartQuantity();
 
+        renderCheckoutHeader();
+        renderOrderSummary();
         renderPaymentSummary();
       })
     })
@@ -105,9 +104,10 @@ export default function renderOrderSummary() {
         }
 
         updateQuantity(productId, newQuantity);
-        document.querySelector(`.js-quantity-label-${productId}`)
-          .innerHTML = newQuantity;
-        updateCartQuantity();
+
+        renderCheckoutHeader();
+        renderOrderSummary();
+        renderPaymentSummary();
 
         container.classList.remove('is-editing-quantity');
       })
@@ -123,18 +123,21 @@ export default function renderOrderSummary() {
       })
     })
 }
-
-function updateCartQuantity() {
-    document.querySelector('.js-return-to-home-link')
-      .innerHTML = `${calculateCartQuantity()} items`;
-}
   
 function deliveryOptionsHTML(productId, cartItem) {
   let html = '';
 
   deliveryOptions.forEach(deliveryOption => {
     const today = dayjs();
-    const deliveryDate = today.add(deliveryOption.deliveryDays, 'day');
+    let deliveryDate = today.add(deliveryOption.deliveryDays, 'day');
+    const dayOfWeek = deliveryDate.format('dddd');
+
+    if (dayOfWeek === 'Saturday') {
+      deliveryDate = deliveryDate.add(2, 'day');
+    } else if (dayOfWeek === 'Sunday') {
+      deliveryDate = deliveryDate.add(1, 'day');
+    }
+
     const dateString = deliveryDate.format('dddd, MMMM D');
 
     const priceString = deliveryOption.priceCents === 0
