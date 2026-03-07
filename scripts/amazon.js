@@ -81,21 +81,20 @@ function renderProductsGrid() {
     })
 
   updateCartQuantity();
+}
 
+function renderAddedMsg(timeoutId, productId) {
+  clearTimeout(timeoutId);
+  const addedMsg = document.querySelector(`.js-added-to-cart-${productId}`);
 
-  function renderAddedMsg(timeoutId, productId) {
-    clearTimeout(timeoutId);
-    const addedMsg = document.querySelector(`.js-added-to-cart-${productId}`);
+  addedMsg.classList.add('added-to-cart-visible');
+  
+  return setTimeout(() => {
+    addedMsg.classList.remove('added-to-cart-visible')
+  }, 2000);
+}
 
-    addedMsg.classList.add('added-to-cart-visible');
-    
-    return setTimeout(() => {
-      addedMsg.classList.remove('added-to-cart-visible')
-    }, 2000);
-  }
-
-  function updateCartQuantity() {
-    document.querySelector('.js-cart-quantity')
-      .innerHTML = calculateCartQuantity();
-  }
+function updateCartQuantity() {
+  document.querySelector('.js-cart-quantity')
+    .innerHTML = calculateCartQuantity();
 }

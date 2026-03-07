@@ -80,6 +80,7 @@ export default function renderPaymentSummary() {
         })
       });
       const order = await response.json();
+      console.log(order);
       addOrder(order);
     } catch (error) {
       console.log('unexpected error, pls try again later');
